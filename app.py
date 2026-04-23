@@ -12,11 +12,11 @@ def get_db_connection():
 @app.route('/')
 def index():
     conn = get_db_connection()
-    # ดึงข้อมูลมาโชว์ในหน้า User.html
+    # ดึงข้อมูลมาโชว์ในหน้า user.html
     orders = conn.execute('SELECT * FROM TOTAL_ORDER').fetchall()
     conn.close()
     # เปลี่ยนชื่อไฟล์ html ให้ตรงกับที่คุณมีในโฟลเดอร์ templates
-    return render_template('User.html', orders=orders)
+    return render_template('user.html', orders=orders)
 
 if __name__ == '__main__':
     app.run(debug=True)
