@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>PizzyPizza - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>🍕 รายการสั่งซื้อ PizzyPizza</h1>
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>เลขที่ออเดอร์</th>
+                <th>รหัสลูกค้า</th>
+                <th>เมนู</th>
+                <th>จำนวน</th>
+                <th>ราคารวม (บาท)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order['order_no'] }}</td>
+                <td>{{ order['customer_no'] }}</td>
+                <td>{{ order['menu_name'] }}</td>
+                <td>{{ order['quantity'] }}</td>
+                <td>{{ order['subtotal'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
