@@ -21,12 +21,12 @@ def index():
     orders = conn.execute('''
         SELECT mq.order_no, m.menu_name, mq.quantity, mq.subtotal 
         FROM menu_quantity mq 
-        JOIN menu m ON mq.menu_id = m.menu_id
+        JOIN menu m ON mq.menu_id = m.menu_id                                           
         ORDER BY mq.qnumber DESC
     ''').fetchall()
     
     conn.close()
-    return render_template('user.html', menus=menus, orders=orders)
+    return render_template('log_in.html', menus=menus, orders=orders)
 
 # Route สำหรับรับออเดอร์
 @app.route('/order', methods=['POST'])

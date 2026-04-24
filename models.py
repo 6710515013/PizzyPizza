@@ -27,13 +27,15 @@ CREATE TABLE menu (
     menu_id INTEGER PRIMARY KEY AUTOINCREMENT,
     menu_name VARCHAR(255) NOT NULL,
     price INTEGER NOT NULL
+    image_url TEXT,
+    category TEXT 
 );
 
 -- ========================
 -- Table: menu_quantity
 -- ========================
 CREATE TABLE menu_quantity (
-    qnumber INTEGER PRIMARY KEY AUTOINCREMENT,
+    Qnumber INTEGER PRIMARY KEY AUTOINCREMENT,
     order_no INTEGER NOT NULL,
     menu_id INTEGER,
     quantity INTEGER NOT NULL,

@@ -5,3 +5,4 @@ __pycache__/
 
 # Ignore SQLite database files
 *.db
+restaurant.db

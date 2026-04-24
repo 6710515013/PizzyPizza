@@ -1,7 +1,3 @@
-
-***
-
-```markdown
 # 🍕 PIZZYPIZZA POS System (KFC Model)
 
 ## 🚀 การติดตั้งโปรเจคสำหรับทีม (First-time Setup)
