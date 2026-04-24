@@ -1,75 +1,56 @@
 # models.py
 
-# รวมคำสั่ง SQL สำหรับสร้างตารางทั้งหมด
+# รวมคำสั่ง SQL สำหรับสร้างตารางใหม่ตาม Redesign
 TABLE_SCHEMA = '''
+-- เปิดการใช้งาน Foreign Key (สำคัญสำหรับ SQLite)
+PRAGMA foreign_keys = ON;
+
 -- ลบตารางเก่าทิ้งก่อน (ถ้ามี)
-DROP TABLE IF EXISTS TOTAL_ORDER;
-DROP TABLE IF EXISTS `ORDER`;
-DROP TABLE IF EXISTS MENU;
-DROP TABLE IF EXISTS `TABLE`;
-DROP TABLE IF EXISTS CUSTOMER;
-DROP TABLE IF EXISTS MANAGER;
+DROP TABLE IF EXISTS manager_logs;
+DROP TABLE IF EXISTS menu_quantity;
+DROP TABLE IF EXISTS menu;
+DROP TABLE IF EXISTS manager;
 
 -- ========================
--- TABLE: MANAGER
+-- Table: manager
 -- ========================
-CREATE TABLE MANAGER (
-    manager_id VARCHAR(10) PRIMARY KEY,
-    user_name VARCHAR(50),
-    password VARCHAR(50)
+CREATE TABLE manager (
+    manager_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_name VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
 );
 
 -- ========================
--- TABLE: CUSTOMER
+-- Table: menu
 -- ========================
-CREATE TABLE CUSTOMER (
-    customer_no INT PRIMARY KEY,
-    customer_status VARCHAR(20)
+CREATE TABLE menu (
+    menu_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    menu_name VARCHAR(255) NOT NULL,
+    price INTEGER NOT NULL
 );
 
 -- ========================
--- TABLE: TABLE (ชื่อชน keyword ต้องใส่ `)
+-- Table: menu_quantity
 -- ========================
-CREATE TABLE `TABLE` (
-    table_no INT PRIMARY KEY,
-    customer_no INT,
-    FOREIGN KEY (customer_no) REFERENCES CUSTOMER(customer_no)
+CREATE TABLE menu_quantity (
+    qnumber INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_no INTEGER NOT NULL,
+    menu_id INTEGER,
+    quantity INTEGER NOT NULL,
+    subtotal INTEGER NOT NULL,
+    FOREIGN KEY (menu_id) REFERENCES menu (menu_id) ON DELETE SET NULL
 );
 
 -- ========================
--- TABLE: MENU (แก้แล้ว ✨)
+-- Table: manager_logs
 -- ========================
-CREATE TABLE MENU (
-    menu_name VARCHAR(100) PRIMARY KEY,
-    price DECIMAL(10, 2),
-    category VARCHAR(50),
-    image_url VARCHAR(255),
-    description TEXT,
-    manager_id VARCHAR(10),
-    FOREIGN KEY (manager_id) REFERENCES MANAGER(manager_id)
-);
-
--- ========================
--- TABLE: ORDER (keyword ต้องใส่ `)
--- ========================
-CREATE TABLE `ORDER` (
-    order_no INT PRIMARY KEY,
-    customer_no INT,
-    manager_id VARCHAR(10),
-    FOREIGN KEY (customer_no) REFERENCES CUSTOMER(customer_no),
-    FOREIGN KEY (manager_id) REFERENCES MANAGER(manager_id)
-);
-
--- ========================
--- TABLE: TOTAL_ORDER (ตารางกลาง)
--- ========================
-CREATE TABLE TOTAL_ORDER (
-    order_no INT,
-    menu_name VARCHAR(100),
-    quantity INT,
-    subtotal DECIMAL(10, 2),
-    PRIMARY KEY (order_no, menu_name),
-    FOREIGN KEY (order_no) REFERENCES `ORDER`(order_no),
-    FOREIGN KEY (menu_name) REFERENCES MENU(menu_name)
+CREATE TABLE manager_logs (
+    log_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    manager_id INTEGER,
+    action_type VARCHAR(50),
+    table_name VARCHAR(50),
+    old_value TEXT,
+    new_value TEXT,
+    FOREIGN KEY (manager_id) REFERENCES manager (manager_id) ON DELETE SET NULL
 );
 '''
