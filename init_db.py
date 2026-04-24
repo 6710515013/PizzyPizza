@@ -17,7 +17,7 @@ def initialize_database():
         cursor.execute("INSERT INTO manager (user_name, password) VALUES ('Admin_Pizza', 'pass1234')")
         
         # 2. ใส่ข้อมูลเมนู
-        cursor.execute("INSERT INTO menu (menu_name, price) VALUES ('Hawaiian Pizza', 299)")
+        cursor.execute("INSERT INTO menu (menu_name, price) VALUES ('Hawaiian Pizza', 299)") 
         cursor.execute("INSERT INTO menu (menu_name, price) VALUES ('Meat Lover', 350)")
         cursor.execute("INSERT INTO menu (menu_name, price) VALUES ('Coke Large', 45)")
         

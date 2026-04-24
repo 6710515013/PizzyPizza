@@ -31,16 +31,16 @@ PIZZYPIZZA/
 │   ├── css/
 │   │   ├── log_in.css
 │   │   ├── manager.css
-│   │   └── user.css
+│   │   └── cashier.css
 │   └── js/
 │       ├── log_in.js
 │       ├── manager.js
-│       └── user.js
+│       └── cashier.js
 │
 ├── templates/             # เก็บไฟล์หน้าจอ HTML
 │   ├── log_in.html
 │   ├── manager.html
-│   └── user.html          
+│   └── cashier.html          
 │
 ├── app.py                 # (Backend) ไฟล์หลักจัดการ Routing รับ-ส่งข้อมูลกับ Frontend
 ├── models.py              # (Backend) ไฟล์รวมฟังก์ชันจัดการ SQL (ดึง/บันทึก/อัปเดตข้อมูล)
