@@ -4,43 +4,41 @@ from models import TABLE_SCHEMA
 
 def initialize_database():
     try:
-        # เชื่อมต่อฐานข้อมูล (จะสร้างไฟล์ restaurant.db ขึ้นมาโดยอัตโนมัติ)
+        # เชื่อมต่อฐานข้อมูล
         conn = sqlite3.connect('restaurant.db')
         cursor = conn.cursor()
         
-        # รันคำสั่งสร้างตารางจาก models.py
+        # รันคำสั่งสร้างตารางใหม่ทั้งหมด
         cursor.executescript(TABLE_SCHEMA)
         
-        # --- ใส่ข้อมูลเริ่มต้น (Seed Data) ---
-        print("กำลังใส่ข้อมูลตัวอย่าง...")
+        print("กำลังใส่ข้อมูลตัวอย่าง (Redesign Version)...")
         
-        # 1. ข้อมูลผู้จัดการ (manager_id, user_name, password)
-        cursor.execute("INSERT INTO MANAGER VALUES ('M01', 'Somchai_Admin', 'pizza1234')")
+        # 1. ใส่ข้อมูลผู้จัดการ (manager_id ปล่อยเป็น NULL เพื่อให้ Auto Increment)
+        cursor.execute("INSERT INTO manager (user_name, password) VALUES ('Admin_Pizza', 'pass1234')")
         
-        # 2. ข้อมูลลูกค้า (customer_no, customer_status)
-        cursor.execute("INSERT INTO CUSTOMER VALUES (101, 'VIP_Member')")
+        # 2. ใส่ข้อมูลเมนู
+        cursor.execute("INSERT INTO menu (menu_name, price) VALUES ('Hawaiian Pizza', 299)")
+        cursor.execute("INSERT INTO menu (menu_name, price) VALUES ('Meat Lover', 350)")
+        cursor.execute("INSERT INTO menu (menu_name, price) VALUES ('Coke Large', 45)")
         
-        # 3. ข้อมูลเมนูอาหาร (menu_name, price, category, image_url, description, manager_id)
-        # 💡 แก้ไข: เพิ่มข้อมูลให้ครบ 6 คอลัมน์ตาม Schema
-        cursor.execute("INSERT INTO MENU VALUES ('Seafood Deluxe', 399.00, 'Pizza', '', 'พิซซ่าหน้าซีฟู้ดเครื่องแน่น', 'M01')")
-        cursor.execute("INSERT INTO MENU VALUES ('Pepperoni', 299.00, 'Pizza', '', 'พิซซ่าหน้าเปปเปอโรนีและชีส', 'M01')")
-        cursor.execute("INSERT INTO MENU VALUES ('French Fries', 89.00, 'Snack', '', 'มันฝรั่งทอดกรอบ', 'M01')")
+        # 3. ใส่ข้อมูลออเดอร์ทดสอบ (สมมติ order_no = 1001)
+        # ใส่รายการที่ 1: Hawaiian 2 ถาด
+        cursor.execute("INSERT INTO menu_quantity (order_no, menu_id, quantity, subtotal) VALUES (1001, 1, 2, 598)")
+        # ใส่รายการที่ 2: Coke 1 ขวด
+        cursor.execute("INSERT INTO menu_quantity (order_no, menu_id, quantity, subtotal) VALUES (1001, 3, 1, 45)")
         
-        # 4. ข้อมูลบิลออเดอร์ (order_no, customer_no, manager_id)
-        cursor.execute("INSERT INTO `ORDER` VALUES (501, 101, 'M01')")
+        # 4. ใส่ Log ตัวอย่าง
+        cursor.execute("""
+            INSERT INTO manager_logs (manager_id, action_type, table_name, old_value, new_value) 
+            VALUES (1, 'CREATE', 'menu', '-', 'Hawaiian Pizza 299')
+        """)
         
-        # 5. ข้อมูลรายการอาหารในบิลนั้น (order_no, menu_name, quantity, subtotal)
-        cursor.execute("INSERT INTO TOTAL_ORDER VALUES (501, 'Seafood Deluxe', 2, 798.00)")
-        cursor.execute("INSERT INTO TOTAL_ORDER VALUES (501, 'French Fries', 1, 89.00)")
-        
-        # ยืนยันการบันทึกข้อมูล
         conn.commit()
-        print("✅ สร้างฐานข้อมูล PizzyPizza และตารางทั้งหมดสำเร็จแล้ว!")
+        print("✅ อัปเดตฐานข้อมูลเป็นโครงสร้างใหม่สำเร็จแล้ว!")
         
     except Exception as e:
         print(f"❌ เกิดข้อผิดพลาด: {e}")
     finally:
-        # ปิดการเชื่อมต่อทุกครั้ง
         conn.close()
 
 if __name__ == '__main__':
