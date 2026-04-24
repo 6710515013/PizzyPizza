@@ -49,7 +49,7 @@ PIZZYPIZZA/
 │
 ├── requirements.txt       # รายชื่อ Library ที่จำเป็น (เช่น flask)
 ├── Document_project.md    # ไฟล์เอกสารของโปรเจค
-└── project_prompt.md      # ไฟล์ contex project สำหรับให้ AI อ่าน
+└── project_prompt.md      # ไฟล์ context project สำหรับให้ AI อ่าน
 ```
 
 ### 4. Database Schema (ข้อมูลหลัก)
