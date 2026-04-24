@@ -12,7 +12,7 @@
 เปิด Terminal (หรือ Git Bash / WSL) แล้วรันคำสั่ง:
 ```bash
 git clone <ใส่-URL-ของ-Repository-ที่นี่>
-cd PIZZYPIZZA
+cd PizzyPizza
 ```
 
 ### 2. สร้างและเปิดใช้งาน Virtual Environment
@@ -42,6 +42,7 @@ pip install -r requirements.txt
 
 ### 4. สร้างฐานข้อมูล (Database Initialization)
 รันคำสั่งนี้ **แค่ครั้งแรกครั้งเดียว** เพื่อสร้างไฟล์ `restaurant.db` และตารางข้อมูลต่างๆ
+ติดตั้ง Extension SQLite Viewer เพื่อที่จะสามารถเปิดไฟล์ restaurant.db และดูข้อมูลใน Database
 ```bash
 python init_db.py
 ```
