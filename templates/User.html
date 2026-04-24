@@ -1,12 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PizzyPizza</title>
+    <title>PizzyPizza - สั่งอาหาร</title>
 </head>
 <body>
-    <h1>🍕 ยินดีต้อนรับสู่ PizzyPizza</h1>
-    <p>ร้านพิซซ่าที่อร่อยที่สุด!</p>
+    <h1>🍕 สั่งเลย! PizzyPizza</h1>
+    
+    <form action="/order" method="POST">
+        <p>
+            เลขโต๊ะ (Table No): 
+            <input type="number" name="table_no" required>
+        </p>
+        <p>
+            เมนูที่ต้องการ: 
+            <select name="menu_name">
+                <option value="Seafood Deluxe">Seafood Deluxe - 399.-</option>
+                <option value="Pepperoni">Pepperoni - 299.-</option>
+            </select>
+        </p>
+        <p>
+            จำนวน: 
+            <input type="number" name="quantity" value="1" min="1">
+        </p>
+        <button type="submit">ยืนยันการสั่งซื้อ</button>
+    </form>
+    <hr>
 
-    <a href="/menu">👉 ไปดูเมนู</a>
+    <table>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.order_no }}</td>
+            <td>{{ order.menu_name }}</td>
+            <td>{{ order.subtotal }} บาท</td>
+        </tr>
+        {% endfor %}
+    </table>
 </body>
 </html>
