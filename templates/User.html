@@ -1,25 +1,23 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>PizzyPizza - สั่งอาหาร</title>
 </head>
+
 <body>
     <h1>🍕 สั่งเลย! PizzyPizza</h1>
-    
-    <form action="/order" method="POST">
+
+    <form action="/order" method="POST">>
         <p>
-            เลขโต๊ะ (Table No): 
-            <input type="number" name="table_no" required>
-        </p>
-        <p>
-            เมนูที่ต้องการ: 
-            <select name="menu_name">
-                <option value="Seafood Deluxe">Seafood Deluxe - 399.-</option>
-                <option value="Pepperoni">Pepperoni - 299.-</option>
+            <label>เลือกเมนูพิซซ่า:</label>
+            <select name="menu_id"> {% for menu in menus %}
+                <option value="{{ menu.menu_id }}">{{ menu.menu_name }} - {{ menu.price }} บาท</option>
+                {% endfor %}
             </select>
         </p>
         <p>
-            จำนวน: 
+            <label>จำนวน:</label>
             <input type="number" name="quantity" value="1" min="1">
         </p>
         <button type="submit">ยืนยันการสั่งซื้อ</button>
@@ -36,4 +34,5 @@
         {% endfor %}
     </table>
 </body>
+
 </html>
