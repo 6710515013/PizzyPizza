@@ -1,18 +1,26 @@
+
+<!-- manager.html -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <title>PizzyPizza - Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/manager.css') }}">
 </head>
+
 <body>
+
+    <!-- 🔙 ปุ่มกลับไปหน้า cashier -->
+    <div style="margin-bottom: 20px;">
+        <a href="{{ url_for('cashier_page') }}">⬅️ กลับหน้าแคชเชียร์ (Cashier)</a>
+    </div>
+
     <h1>🍕 รายการสั่งซื้อ PizzyPizza</h1>
     
     <table border="1">
         <thead>
             <tr>
                 <th>เลขที่ออเดอร์</th>
-                <th>รหัสลูกค้า</th>
                 <th>เมนู</th>
                 <th>จำนวน</th>
                 <th>ราคารวม (บาท)</th>
@@ -22,7 +30,6 @@
             {% for order in orders %}
             <tr>
                 <td>{{ order['order_no'] }}</td>
-                <td>{{ order['customer_no'] }}</td>
                 <td>{{ order['menu_name'] }}</td>
                 <td>{{ order['quantity'] }}</td>
                 <td>{{ order['subtotal'] }}</td>
@@ -30,5 +37,8 @@
             {% endfor %}
         </tbody>
     </table>
+    <script src="{{ url_for('static', filename='js/manager.js') }}"></script>
 </body>
 </html>
+
+    

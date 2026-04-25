@@ -1,0 +1,120 @@
+/* ===== manager.css ===== */
+/* ===== พื้นหลัง ===== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+}
+
+/* ===== หัวข้อบนสุด ===== */
+h1 {
+    width: 100%;
+    text-align: center;
+    padding: 20px 0;
+    margin: 0;
+
+    background-color: #ffffff;
+    color: #333;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ทำคำว่า PizzyPizza เป็นสีแดง */
+h1 span {
+    color: #E50000;
+}
+
+/* ===== กล่องเนื้อหา ===== */
+.container {
+    max-width: 900px;
+    margin: 30px auto; /* จัดให้อยู่กลาง */
+    padding: 20px;
+
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== หัวข้อย่อย ===== */
+h2 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* ===== ฟอร์ม ===== */
+form {
+    margin-bottom: 30px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+select,
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* ปุ่ม */
+button {
+    width: 100%;
+    padding: 12px;
+
+    background-color: #E50000;
+    color: white;
+
+    border: none;
+    border-radius: 5px;
+
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #b30000;
+}
+
+/* ===== ส่วนตาราง (บังคับขึ้นบรรทัดใหม่) ===== */
+.table-section {
+    margin-top: 20px;
+    display: block; /* กันพลาด */
+}
+
+/* ===== ตาราง ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+/* header */
+thead {
+    background-color: #E50000;
+    color: white;
+}
+
+/* cell */
+th,
+td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+/* แถวสลับสี */
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* hover */
+tbody tr:hover {
+    background-color: #ffe5e5;
+}
