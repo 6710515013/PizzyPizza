@@ -17,18 +17,18 @@ def initialize_database():
         cursor.execute("INSERT INTO manager (user_name, password) VALUES ('Admin_Pizza', 'pass1234')")
         
         # 2. ใส่ข้อมูลเมนู
-        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Hawaiian Pizza', 299, '', 'pizza')") 
-        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Tom Yum Kung', 399, '', 'pizza')")
-        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Pepperoni', 299, '', 'pizza')")
-        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Super Supreme', 359, '', 'pizza')")
-        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Seafood Cocktail', 359, '', 'pizza')")
-        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Double Cheese', 299, '', 'pizza')")
-        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('French Fries', 79, '', 'snack')")
-        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Spaghetti Carbonara', 129, '', 'snack')")
-        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Cheese Sticks', 99, '', 'snack')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Hawaiian Pizza', 299, '', 'Food')") 
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Tom Yum Kung Pizza', 399, '', 'Food')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Pepperoni Pizza', 299, '', 'Food')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Super Supreme Pizza', 359, '', 'Food')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Seafood Cocktail Pizza', 359, '', 'Food')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Double Cheese Pizza', 299, '', 'Food')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('French Fries', 79, '', 'Snack')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Spaghetti Carbonara', 129, '', 'Snack')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Cheese Sticks', 99, '', 'Snack')")
         
         # 3. ใส่ข้อมูลเครื่องดื่ม 
-        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Refill Soft Drinks', 49, '', 'drink')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Refill Soft Drinks', 49, '', 'drinks')")
        
         
     
