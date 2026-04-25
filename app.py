@@ -70,7 +70,7 @@ def get_menus_api():
         cat = str(row['category']).lower() if row['category'] else ""
         name_lower = row['menu_name'].lower()
         
-        if 'pizza' in cat or any(w in name_lower for w in ['pizza', 'supreme', 'cheese', 'hawaiian']):
+        if 'pizza' in cat or any(w in name_lower for w in ['pizza', 'supreme', 'hawaiian']):
             menu_data['pizza'].append(item)
         elif 'drink' in cat or any(w in name_lower for w in ['coke', 'water', 'drink', 'tea', 'pepsi']):
             menu_data['drink'].append(item)

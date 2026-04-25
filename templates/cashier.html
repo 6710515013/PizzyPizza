@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pizza POS Project</title>
+    <title>Pizza POS Project - แคชเชียร์</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 h-screen overflow-hidden flex">
@@ -24,18 +23,16 @@
                 <span class="text-3xl text-red-600 font-mono"><span id="total-price">0</span>.-</span>
             </div>
             <button onclick="clearCart()" class="w-full bg-gray-200 hover:bg-gray-300 py-2 mb-2 rounded font-bold transition">ล้างหน้าจอ</button>
-            <button onclick="checkout()" class="w-full bg-green-500 text-white py-4 rounded font-bold">
+            <button onclick="checkout()" class="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded font-bold transition">
                 ชำระเงิน
             </button>
         </div>
     </div>
 
-    
-
-    <div class="flex-grow p-4 bg-gray-200 flex flex-col overflow-hidden">
+    <div class="flex-grow p-4 bg-gray-200 flex flex-col overflow-hidden relative">
+        
         <div class="flex justify-between items-center mb-4 bg-white p-3 rounded-xl shadow-sm">
-            <h3 class="text-lg font-bold text-gray-700 ml-2"></h3>
-            
+            <h3 class="text-lg font-bold text-gray-700 ml-2">เลือกรายการอาหาร</h3>
             <div class="relative w-72"> 
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,82 +47,63 @@
             
         <div class="flex gap-4 mb-6">
             <button id="btn-pizza" onclick="changeCategory('pizza')" class="flex-1 py-4 bg-red-600 text-white rounded-xl font-bold shadow-md transition-all">
-                <i class="fas fa-pizza-slice mr-2"></i> พิซซ่า
+                พิซซ่า
             </button>
-        
             <button id="btn-snack" onclick="changeCategory('snack')" class="flex-1 py-4 bg-white text-gray-700 rounded-xl font-bold shadow-sm hover:bg-gray-100 transition-all border border-gray-200">
-                <i class="fas fa-hamburger mr-2"></i> ของทานเล่น
+                ของทานเล่น
             </button>
-        
             <button id="btn-drink" onclick="changeCategory('drink')" class="flex-1 py-4 bg-white text-gray-700 rounded-xl font-bold shadow-sm hover:bg-gray-100 transition-all border border-gray-200">
-                <i class="fas fa-glass-whiskey mr-2"></i> เครื่องดื่ม
+                เครื่องดื่ม
             </button>
         </div>
         
-        <div id="menu-grid" class="grid grid-cols-3 gap-4">
+        <div id="menu-grid" class="grid grid-cols-3 gap-4 overflow-y-auto pb-20">
             </div>
-        <div class="grid grid-cols-3 gap-4">
+
+        <div class="absolute bottom-4 right-4">
+            <a href="{{ url_for('manager_page') }}">
+                <button type="button" class="bg-gray-800 hover:bg-gray-900 text-white py-2 px-4 rounded-lg shadow font-bold text-sm transition">
+                    ⚙️ ระบบจัดการ (Manager)
+                </button>
+            </a>
         </div>
     </div>
-
-    <div style="margin-top: 30px; text-align: right; padding: 20px; border-top: 2px solid #eee;">
-        <p style="color: #666; font-size: 0.9em;">สำหรับเจ้าหน้าที่:</p>
-        <a href="{{ url_for('manager_page') }}">
-            <button type="button" style="
-                background-color: #333; 
-                color: white; 
-                padding: 10px 20px; 
-                border: none; 
-                border-radius: 5px; 
-                cursor: pointer;
-                font-weight: bold;
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;">
-                ⚙️ เข้าสู่ระบบจัดการ (Manager)
-            </button>
-        </a>
-    </div>
-
-    
 
     <script>
-        // 1. รับข้อมูลจาก Database ผ่าน Flask (ห้ามประกาศซ้ำ)
-        let menuData = {};
-        let currentCategory = 'pizza';
-        let cart = []; 
+        // --- ตัวแปรสำหรับเก็บข้อมูล ---
+        let menuData = {}; // เก็บข้อมูลเมนูที่ดึงมาจากฐานข้อมูล
+        let currentCategory = 'pizza'; // หมวดหมู่เริ่มต้นที่เปิดแสดง
+        let cart = []; // เก็บรายการอาหารที่ลูกค้าเลือก
 
-        // 2. สร้างฟังก์ชันสำหรับดึงข้อมูลจาก API ที่เราเพิ่งสร้างใน app.py
-    async function loadMenus() {
-        try {
-            // ยิงไปที่ Route '/api/menus' ที่เราเพิ่มใน Python
-            const response = await fetch('/api/menus');
-            
-            // แปลงข้อมูลที่ได้รับเป็น JSON แล้วเก็บลงในตัวแปร menuData
-            menuData = await response.json();
-            
-            // เมื่อโหลดข้อมูลสำเร็จแล้ว ให้สั่งวาดเมนูบนหน้าจอทันที
-            renderMenu();
-            updateTabStyles();
-        } catch (error) {
-            console.error("ไม่สามารถโหลดข้อมูลเมนูได้:", error);
-            alert("เกิดข้อผิดพลาดในการดึงข้อมูลจาก Database");
+        // 1. ฟังก์ชันดึงข้อมูลเมนูจาก Backend (API ที่เราสร้างใน app.py)
+        async function loadMenus() {
+            try {
+                // ส่งคำขอไปดึงข้อมูลจากฐานข้อมูล
+                const response = await fetch('/api/menus');
+                menuData = await response.json(); // เก็บข้อมูลลงตัวแปร menuData
+                
+                renderMenu(); // วาดเมนูขึ้นหน้าจอ
+                updateTabStyles(); // ปรับสีปุ่มหมวดหมู่ให้ถูกต้อง
+            } catch (error) {
+                console.error("ไม่สามารถโหลดข้อมูลเมนูได้:", error);
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล");
+            }
         }
-    }
     
-        // 2. ฟังก์ชันเปลี่ยนหมวดหมู่
+        // 2. ฟังก์ชันเมื่อกดเปลี่ยนหมวดหมู่ (Pizza -> Snack -> Drink)
         function changeCategory(category) {
             currentCategory = category;
             updateTabStyles();
             renderMenu();
         }
     
-        // 3. ฟังก์ชันวาดเมนู (ดึงข้อมูลจาก menuData ที่โหลดมา)
+        // 3. ฟังก์ชันวาดปุ่มเมนูบนหน้าจอ
         function renderMenu() {
             const grid = document.getElementById('menu-grid');
             if (!grid) return;
-            grid.innerHTML = ''; 
+            grid.innerHTML = ''; // ล้างหน้าจอเดิมก่อน
             
+            // วนลูปสร้างปุ่มตามหมวดหมู่ที่เลือก
             if (menuData[currentCategory]) {
                 menuData[currentCategory].forEach(item => {
                     grid.innerHTML += `
@@ -138,26 +116,28 @@
                 });
             }
         }
-
-       
     
-        // 4. จัดการตะกร้าสินค้า (ใช้ ID จาก Database ในการอ้างอิง)
+        // 4. ฟังก์ชันเพิ่มรายการอาหารลงตะกร้า
         function addToCart(id, name, price) {
             const existingItem = cart.find(item => item.id === id);
             if (existingItem) {
+                // ถ้ามีเมนูนี้ในตะกร้าแล้ว ให้บวกจำนวนเพิ่ม
                 existingItem.qty += 1;
             } else {
+                // ถ้ายังไม่มี ให้สร้างรายการใหม่
                 cart.push({ id: id, name: name, price: price, qty: 1 });
             }
-            renderCart();
+            renderCart(); // อัปเดตตะกร้าหน้าจอ
         }
     
+        // 5. ฟังก์ชันแสดงรายการในตะกร้า
         function renderCart() {
             const list = document.getElementById('cart-items');
             const totalDisplay = document.getElementById('total-price');
             list.innerHTML = ''; 
             let total = 0;
     
+            // วนลูปรายการที่เลือกเพื่อแสดงผล
             cart.forEach((item, index) => {
                 const itemTotal = item.price * item.qty;
                 total += itemTotal;
@@ -170,7 +150,7 @@
                             </div>
                             <p class="text-sm text-gray-500">${item.price}.- (รวม ${itemTotal}.-)</p>
                         </div>
-                        <button onclick="removeItem(${index})" class="ml-4 text-red-400 hover:text-red-600 font-bold text-xs bg-red-50 px-2 py-1 rounded italic">ลบ</button>
+                        <button onclick="removeItem(${index})" class="ml-4 text-red-400 hover:text-red-600 font-bold text-xs bg-red-50 px-2 py-1 rounded italic">ลด/ลบ</button>
                     </div>
                 `;
             });
@@ -178,19 +158,20 @@
             if (cart.length === 0) {
                 list.innerHTML = '<div class="text-center text-gray-400 mt-10 italic">ยังไม่มีรายการอาหาร...</div>';
             }
-            totalDisplay.innerText = total.toLocaleString();
+            totalDisplay.innerText = total.toLocaleString(); // แสดงราคารวม
         }
     
-        // ฟังก์ชันอื่นๆ (ลบ, ล้างหน้าจอ, ชำระเงิน)
+        // 6. ฟังก์ชันลบ/ลดจำนวนสินค้าในตะกร้า
         function removeItem(index) {
             if (cart[index].qty > 1) {
-                cart[index].qty -= 1;
+                cart[index].qty -= 1; // ลดจำนวน
             } else {
-                cart.splice(index, 1);
+                cart.splice(index, 1); // ลบออกเมื่อเหลือ 0
             }
             renderCart();
         }
     
+        // 7. ฟังก์ชันล้างตะกร้าทั้งหมด
         function clearCart() {
             if(confirm("ต้องการล้างรายการทั้งหมดใช่หรือไม่?")) {
                 cart = [];
@@ -198,80 +179,94 @@
             }
         }
     
+        // 8. ฟังก์ชันชำระเงิน (ส่งข้อมูลไปบันทึกลง Database) ***แก้ไขใหม่***
         function checkout() {
             if (cart.length === 0) {
                 alert("ยังไม่มีรายการอาหาร กรุณาเลือกเมนูก่อนชำระเงินครับ");
                 return;
             }
-            const totalAmount = document.getElementById('total-price').innerText;
-            alert("ยืนยันออเดอร์เรียบร้อย! ยอดชำระทั้งหมดคือ: " + totalAmount + " บาท");
-            cart = [];
-            renderCart();
+
+            // ส่งข้อมูล cart ไปที่ backend (app.py) ผ่าน /checkout
+            fetch('/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cart: cart }) // แปลงข้อมูลให้เป็น JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // หากบันทึกสำเร็จ ให้แสดงหมายเลขคิว (order_no) ที่ได้จากหลังบ้าน
+                    alert(`✅ ชำระเงินสำเร็จ!\nหมายเลขคิวของคุณคือ: ${data.order_no}`);
+                    cart = []; // ล้างข้อมูลตะกร้า
+                    renderCart(); // ล้างหน้าจอ
+                } else {
+                    alert("❌ เกิดข้อผิดพลาด: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("ไม่สามารถติดต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่");
+            });
         }
     
+        // 9. ฟังก์ชันปรับแต่งสีปุ่มหมวดหมู่ให้สวยงาม
         function updateTabStyles() {
             const categories = ['pizza', 'snack', 'drink'];
             categories.forEach(cat => {
                 const btn = document.getElementById(`btn-${cat}`);
                 if(cat === currentCategory) {
+                    // ปุ่มที่ถูกเลือก (สีแดง)
                     btn.className = "flex-1 py-4 bg-red-600 text-white rounded-xl font-bold shadow-md transition-all";
                 } else {
+                    // ปุ่มที่ไม่ได้เลือก (สีขาว)
                     btn.className = "flex-1 py-4 bg-white text-gray-700 rounded-xl font-bold shadow-sm hover:bg-gray-100 transition-all border border-gray-200";
                 }
             });
         }
-        // ฟังก์ชันค้นหาเมนูจากทุกหมวดหมู่
-// ฟังก์ชันค้นหาเมนูพร้อมระบบเปลี่ยนหมวดหมู่อัตโนมัติ (Auto-Switch Tab)
-function searchMenu() {
-    const searchTerm = document.getElementById('search-input').value.toLowerCase();
-    const grid = document.getElementById('menu-grid');
-    
-    // 1. ถ้าช่องค้นหาว่างเปล่า ให้กลับไปแสดงหมวดหมู่ปัจจุบัน
-    if (searchTerm === '') {
-        renderMenu();
-        return;
-    }
 
-    grid.innerHTML = '';
-    let foundCategories = new Set(); // เก็บหมวดหมู่ที่ค้นพบ
-    let matchCount = 0;
-    let lastFoundCategory = '';
-
-    // 2. เริ่มการค้นหา
-    Object.keys(menuData).forEach(category => {
-        menuData[category].forEach(item => {
-            if (item.name.toLowerCase().includes(searchTerm)) {
-                matchCount++;
-                lastFoundCategory = category; // บันทึกหมวดหมู่ที่เจอ
-                foundCategories.add(category);
-
-                grid.innerHTML += `
-                    <button onclick="addToCart(${item.id}, '${item.name}', ${item.price})" 
-                        class="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl active:scale-95 transition-all text-center border-2 border-transparent hover:border-red-400 animate-fade-in">
-                        <span class="block font-bold text-xl text-gray-800">${item.name}</span>
-                        <span class="block text-red-500 font-bold mt-2">${item.price}.-</span>
-                    </button>
-                `;
+        // 10. ฟังก์ชันค้นหาเมนู
+        function searchMenu() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const grid = document.getElementById('menu-grid');
+            
+            if (searchTerm === '') {
+                renderMenu();
+                return;
             }
-        });
-    });
 
-    // 3. Logic: กระโดดไปที่หมวดหมู่โดยอัตโนมัติ (Auto-Switch)
-    // เงื่อนไข: ถ้าค้นพบเมนูจากเพียงหมวดหมู่เดียว และหมวดหมู่นั้นไม่ใช่หมวดหมู่ปัจจุบัน
-    if (foundCategories.size === 1 && lastFoundCategory !== currentCategory) {
-        currentCategory = lastFoundCategory;
-        updateTabStyles(); // อัปเดตสีของปุ่มหมวดหมู่ให้ตรงกัน
-    }
+            grid.innerHTML = '';
+            let foundCategories = new Set();
+            let lastFoundCategory = '';
 
-    // 4. กรณีไม่พบเมนู
-    if (grid.innerHTML === '') {
-        grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 italic">ไม่พบเมนูที่ค้นหา...</div>';
-    }
-}
+            Object.keys(menuData).forEach(category => {
+                menuData[category].forEach(item => {
+                    if (item.name.toLowerCase().includes(searchTerm)) {
+                        lastFoundCategory = category; 
+                        foundCategories.add(category);
+
+                        grid.innerHTML += `
+                            <button onclick="addToCart(${item.id}, '${item.name}', ${item.price})" 
+                                class="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl active:scale-95 transition-all text-center border-2 border-transparent hover:border-red-400 animate-fade-in">
+                                <span class="block font-bold text-xl text-gray-800">${item.name}</span>
+                                <span class="block text-red-500 font-bold mt-2">${item.price}.-</span>
+                            </button>
+                        `;
+                    }
+                });
+            });
+
+            if (foundCategories.size === 1 && lastFoundCategory !== currentCategory) {
+                currentCategory = lastFoundCategory;
+                updateTabStyles();
+            }
+
+            if (grid.innerHTML === '') {
+                grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 italic">ไม่พบเมนูที่ค้นหา...</div>';
+            }
+        }
     
-        // รันครั้งแรก
-        renderMenu();
-        loadMenus();
+        // --- เริ่มต้นการทำงาน (เมื่อเปิดหน้าเว็บ) ---
+        loadMenus(); // โหลดข้อมูลอาหารจากฐานข้อมูล
     </script>
 
 </body>
