@@ -26,7 +26,7 @@ CREATE TABLE manager (
 CREATE TABLE menu (
     menu_id INTEGER PRIMARY KEY AUTOINCREMENT,
     menu_name VARCHAR(255) NOT NULL,
-    price INTEGER NOT NULL
+    price INTEGER NOT NULL,
     image_url TEXT,
     category TEXT 
 );

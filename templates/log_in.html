@@ -1,1 +1,106 @@
-pleas login
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PizzyPizza</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .login-container h2 {
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .login-container h2 span {
+            color: #E50000; /* สีแดงสไตล์ร้านฟาสต์ฟู้ด */
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #E50000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .login-btn:hover {
+            background-color: #b30000;
+        }
+        /* ส่วนสำหรับแสดงข้อความแจ้งเตือนเมื่อล็อกอินผิด */
+        .flash-message {
+            color: white;
+            background-color: #ff4c4c;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>ระบบสั่งอาหาร <span>PizzyPizza</span></h2>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="/login" method="POST">
+            <div class="input-group">
+                <label for="username">ชื่อผู้ใช้งาน (Username)</label>
+                <input type="text" id="username" name="username" placeholder="กรอกชื่อผู้ใช้งาน" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="password">รหัสผ่าน (Password)</label>
+                <input type="password" id="password" name="password" placeholder="กรอกรหัสผ่าน" required>
+            </div>
+            
+            <button type="submit" class="login-btn">เข้าสู่ระบบ</button>
+        </form>
+    </div>
+
+</body>
+</html>

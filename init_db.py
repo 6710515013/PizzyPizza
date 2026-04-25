@@ -17,15 +17,21 @@ def initialize_database():
         cursor.execute("INSERT INTO manager (user_name, password) VALUES ('Admin_Pizza', 'pass1234')")
         
         # 2. ใส่ข้อมูลเมนู
-        cursor.execute("INSERT INTO menu (menu_name, price) VALUES ('Hawaiian Pizza', 299)") 
-        cursor.execute("INSERT INTO menu (menu_name, price) VALUES ('Meat Lover', 350)")
-        cursor.execute("INSERT INTO menu (menu_name, price) VALUES ('Coke Large', 45)")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Hawaiian Pizza', 299, '', 'Food')") 
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Tom Yum Kung', 399, '', 'Food')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Pepperoni', 299, '', 'Food')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Super Supreme', 359, '', 'Food')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Seafood Cocktail', 359, '', 'Food')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Double Cheese', 299, '', 'Food')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('French Fries', 79, '', 'Food')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Spaghetti Carbonara', 129, '', 'Food')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Cheese Sticks', 99, '', 'Food')")
         
-        # 3. ใส่ข้อมูลออเดอร์ทดสอบ (สมมติ order_no = 1001)
-        # ใส่รายการที่ 1: Hawaiian 2 ถาด
-        cursor.execute("INSERT INTO menu_quantity (order_no, menu_id, quantity, subtotal) VALUES (1001, 1, 2, 598)")
-        # ใส่รายการที่ 2: Coke 1 ขวด
-        cursor.execute("INSERT INTO menu_quantity (order_no, menu_id, quantity, subtotal) VALUES (1001, 3, 1, 45)")
+        # 3. ใส่ข้อมูลเครื่องดื่ม 
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Refill Soft Drinks', 49, '', 'drinks')")
+       
+        
+    
         
         # 4. ใส่ Log ตัวอย่าง
         cursor.execute("""
