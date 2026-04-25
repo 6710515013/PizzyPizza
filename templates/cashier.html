@@ -1,38 +1,258 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="th">
 <head>
-    <title>PizzyPizza - สั่งอาหาร</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza POS Project</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body class="bg-gray-100 h-screen overflow-hidden flex">
 
-<body>
-    <h1>🍕 สั่งเลย! PizzyPizza</h1>
+    <div class="w-1/3 bg-white border-r flex flex-col shadow-xl">
+        <div class="p-5 bg-red-600 text-white shadow-md">
+            <h2 class="text-2xl font-bold italic text-center">🍕 PIZZYPIZZA</h2>
+        </div>
+        
+        <div id="cart-items" class="flex-grow overflow-y-auto p-4 space-y-3">
+            <div class="text-center text-gray-400 mt-10 italic">ยังไม่มีรายการอาหาร...</div>
+        </div>
 
-    <form action="/order" method="POST">>
-        <p>
-            <label>เลือกเมนูพิซซ่า:</label>
-            <select name="menu_id"> {% for menu in menus %}
-                <option value="{{ menu.menu_id }}">{{ menu.menu_name }} - {{ menu.price }} บาท</option>
-                {% endfor %}
-            </select>
-        </p>
-        <p>
-            <label>จำนวน:</label>
-            <input type="number" name="quantity" value="1" min="1">
-        </p>
-        <button type="submit">ยืนยันการสั่งซื้อ</button>
-    </form>
-    <hr>
+        <div class="p-6 border-t bg-gray-50">
+            <div class="flex justify-between text-xl font-bold mb-4">
+                <span>ยอดรวมทั้งหมด:</span>
+                <span class="text-3xl text-red-600 font-mono"><span id="total-price">0</span>.-</span>
+            </div>
+            <button onclick="clearCart()" class="w-full bg-gray-200 hover:bg-gray-300 py-2 mb-2 rounded font-bold transition">ล้างหน้าจอ</button>
+            <button onclick="checkout()" class="w-full bg-green-500 text-white py-4 rounded font-bold">
+                ชำระเงิน
+            </button>
+        </div>
+    </div>
 
-    <table>
-        {% for order in orders %}
-        <tr>
-            <td>{{ order.order_no }}</td>
-            <td>{{ order.menu_name }}</td>
-            <td>{{ order.subtotal }} บาท</td>
-        </tr>
-        {% endfor %}
-    </table>
+    
+
+    <div class="flex-grow p-4 bg-gray-200 flex flex-col overflow-hidden">
+        <div class="flex justify-between items-center mb-4 bg-white p-3 rounded-xl shadow-sm">
+            <h3 class="text-lg font-bold text-gray-700 ml-2"></h3>
+            
+            <div class="relative w-72"> 
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </span>
+                <input type="text" id="search-input" onkeyup="searchMenu()" 
+                       placeholder="ค้นหาด่วน..." 
+                       class="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-red-500 outline-none text-sm transition-all">
+            </div>
+        </div>
+            
+        <div class="flex gap-4 mb-6">
+            <button id="btn-pizza" onclick="changeCategory('pizza')" class="flex-1 py-4 bg-red-600 text-white rounded-xl font-bold shadow-md transition-all">
+                <i class="fas fa-pizza-slice mr-2"></i> พิซซ่า
+            </button>
+        
+            <button id="btn-snack" onclick="changeCategory('snack')" class="flex-1 py-4 bg-white text-gray-700 rounded-xl font-bold shadow-sm hover:bg-gray-100 transition-all border border-gray-200">
+                <i class="fas fa-hamburger mr-2"></i> ของทานเล่น
+            </button>
+        
+            <button id="btn-drink" onclick="changeCategory('drink')" class="flex-1 py-4 bg-white text-gray-700 rounded-xl font-bold shadow-sm hover:bg-gray-100 transition-all border border-gray-200">
+                <i class="fas fa-glass-whiskey mr-2"></i> เครื่องดื่ม
+            </button>
+        </div>
+        
+        <div id="menu-grid" class="grid grid-cols-3 gap-4">
+            </div>
+        <div class="grid grid-cols-3 gap-4">
+        </div>
+    </div>
+
+    
+
+    <script>
+        // 1. รับข้อมูลจาก Database ผ่าน Flask (ห้ามประกาศซ้ำ)
+        let menuData = {};
+        let currentCategory = 'pizza';
+        let cart = []; 
+
+        // 2. สร้างฟังก์ชันสำหรับดึงข้อมูลจาก API ที่เราเพิ่งสร้างใน app.py
+    async function loadMenus() {
+        try {
+            // ยิงไปที่ Route '/api/menus' ที่เราเพิ่มใน Python
+            const response = await fetch('/api/menus');
+            
+            // แปลงข้อมูลที่ได้รับเป็น JSON แล้วเก็บลงในตัวแปร menuData
+            menuData = await response.json();
+            
+            // เมื่อโหลดข้อมูลสำเร็จแล้ว ให้สั่งวาดเมนูบนหน้าจอทันที
+            renderMenu();
+            updateTabStyles();
+        } catch (error) {
+            console.error("ไม่สามารถโหลดข้อมูลเมนูได้:", error);
+            alert("เกิดข้อผิดพลาดในการดึงข้อมูลจาก Database");
+        }
+    }
+    
+        // 2. ฟังก์ชันเปลี่ยนหมวดหมู่
+        function changeCategory(category) {
+            currentCategory = category;
+            updateTabStyles();
+            renderMenu();
+        }
+    
+        // 3. ฟังก์ชันวาดเมนู (ดึงข้อมูลจาก menuData ที่โหลดมา)
+        function renderMenu() {
+            const grid = document.getElementById('menu-grid');
+            if (!grid) return;
+            grid.innerHTML = ''; 
+            
+            if (menuData[currentCategory]) {
+                menuData[currentCategory].forEach(item => {
+                    grid.innerHTML += `
+                        <button onclick="addToCart(${item.id}, '${item.name}', ${item.price})" 
+                            class="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl active:scale-95 transition-all text-center border-2 border-transparent hover:border-red-400">
+                            <span class="block font-bold text-xl text-gray-800">${item.name}</span>
+                            <span class="block text-red-500 font-bold mt-2">${item.price}.-</span>
+                        </button>
+                    `;
+                });
+            }
+        }
+
+       
+    
+        // 4. จัดการตะกร้าสินค้า (ใช้ ID จาก Database ในการอ้างอิง)
+        function addToCart(id, name, price) {
+            const existingItem = cart.find(item => item.id === id);
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                cart.push({ id: id, name: name, price: price, qty: 1 });
+            }
+            renderCart();
+        }
+    
+        function renderCart() {
+            const list = document.getElementById('cart-items');
+            const totalDisplay = document.getElementById('total-price');
+            list.innerHTML = ''; 
+            let total = 0;
+    
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.qty;
+                total += itemTotal;
+                list.innerHTML += `
+                    <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border-l-4 border-red-500 mb-2">
+                        <div class="flex-grow">
+                            <div class="flex justify-between">
+                                <p class="font-bold text-gray-800">${item.name}</p>
+                                <p class="font-bold text-blue-600">x${item.qty}</p> 
+                            </div>
+                            <p class="text-sm text-gray-500">${item.price}.- (รวม ${itemTotal}.-)</p>
+                        </div>
+                        <button onclick="removeItem(${index})" class="ml-4 text-red-400 hover:text-red-600 font-bold text-xs bg-red-50 px-2 py-1 rounded italic">ลบ</button>
+                    </div>
+                `;
+            });
+    
+            if (cart.length === 0) {
+                list.innerHTML = '<div class="text-center text-gray-400 mt-10 italic">ยังไม่มีรายการอาหาร...</div>';
+            }
+            totalDisplay.innerText = total.toLocaleString();
+        }
+    
+        // ฟังก์ชันอื่นๆ (ลบ, ล้างหน้าจอ, ชำระเงิน)
+        function removeItem(index) {
+            if (cart[index].qty > 1) {
+                cart[index].qty -= 1;
+            } else {
+                cart.splice(index, 1);
+            }
+            renderCart();
+        }
+    
+        function clearCart() {
+            if(confirm("ต้องการล้างรายการทั้งหมดใช่หรือไม่?")) {
+                cart = [];
+                renderCart();
+            }
+        }
+    
+        function checkout() {
+            if (cart.length === 0) {
+                alert("ยังไม่มีรายการอาหาร กรุณาเลือกเมนูก่อนชำระเงินครับ");
+                return;
+            }
+            const totalAmount = document.getElementById('total-price').innerText;
+            alert("ยืนยันออเดอร์เรียบร้อย! ยอดชำระทั้งหมดคือ: " + totalAmount + " บาท");
+            cart = [];
+            renderCart();
+        }
+    
+        function updateTabStyles() {
+            const categories = ['pizza', 'snack', 'drink'];
+            categories.forEach(cat => {
+                const btn = document.getElementById(`btn-${cat}`);
+                if(cat === currentCategory) {
+                    btn.className = "flex-1 py-4 bg-red-600 text-white rounded-xl font-bold shadow-md transition-all";
+                } else {
+                    btn.className = "flex-1 py-4 bg-white text-gray-700 rounded-xl font-bold shadow-sm hover:bg-gray-100 transition-all border border-gray-200";
+                }
+            });
+        }
+        // ฟังก์ชันค้นหาเมนูจากทุกหมวดหมู่
+// ฟังก์ชันค้นหาเมนูพร้อมระบบเปลี่ยนหมวดหมู่อัตโนมัติ (Auto-Switch Tab)
+function searchMenu() {
+    const searchTerm = document.getElementById('search-input').value.toLowerCase();
+    const grid = document.getElementById('menu-grid');
+    
+    // 1. ถ้าช่องค้นหาว่างเปล่า ให้กลับไปแสดงหมวดหมู่ปัจจุบัน
+    if (searchTerm === '') {
+        renderMenu();
+        return;
+    }
+
+    grid.innerHTML = '';
+    let foundCategories = new Set(); // เก็บหมวดหมู่ที่ค้นพบ
+    let matchCount = 0;
+    let lastFoundCategory = '';
+
+    // 2. เริ่มการค้นหา
+    Object.keys(menuData).forEach(category => {
+        menuData[category].forEach(item => {
+            if (item.name.toLowerCase().includes(searchTerm)) {
+                matchCount++;
+                lastFoundCategory = category; // บันทึกหมวดหมู่ที่เจอ
+                foundCategories.add(category);
+
+                grid.innerHTML += `
+                    <button onclick="addToCart(${item.id}, '${item.name}', ${item.price})" 
+                        class="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl active:scale-95 transition-all text-center border-2 border-transparent hover:border-red-400 animate-fade-in">
+                        <span class="block font-bold text-xl text-gray-800">${item.name}</span>
+                        <span class="block text-red-500 font-bold mt-2">${item.price}.-</span>
+                    </button>
+                `;
+            }
+        });
+    });
+
+    // 3. Logic: กระโดดไปที่หมวดหมู่โดยอัตโนมัติ (Auto-Switch)
+    // เงื่อนไข: ถ้าค้นพบเมนูจากเพียงหมวดหมู่เดียว และหมวดหมู่นั้นไม่ใช่หมวดหมู่ปัจจุบัน
+    if (foundCategories.size === 1 && lastFoundCategory !== currentCategory) {
+        currentCategory = lastFoundCategory;
+        updateTabStyles(); // อัปเดตสีของปุ่มหมวดหมู่ให้ตรงกัน
+    }
+
+    // 4. กรณีไม่พบเมนู
+    if (grid.innerHTML === '') {
+        grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 italic">ไม่พบเมนูที่ค้นหา...</div>';
+    }
+}
+    
+        // รันครั้งแรก
+        renderMenu();
+        loadMenus();
+    </script>
+
 </body>
-
 </html>

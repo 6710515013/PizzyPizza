@@ -23,9 +23,9 @@ def initialize_database():
         cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Super Supreme', 359, '', 'Food')")
         cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Seafood Cocktail', 359, '', 'Food')")
         cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Double Cheese', 299, '', 'Food')")
-        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('French Fries', 79, '', 'Food')")
-        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Spaghetti Carbonara', 129, '', 'Food')")
-        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Cheese Sticks', 99, '', 'Food')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('French Fries', 79, '', 'Snack')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Spaghetti Carbonara', 129, '', 'Snack')")
+        cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Cheese Sticks', 99, '', 'Snack')")
         
         # 3. ใส่ข้อมูลเครื่องดื่ม 
         cursor.execute("INSERT INTO menu (menu_name, price, image_url, category) VALUES ('Refill Soft Drinks', 49, '', 'drinks')")
