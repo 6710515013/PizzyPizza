@@ -25,7 +25,7 @@ CREATE TABLE manager (
 -- ========================
 CREATE TABLE menu (
     menu_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    menu_name VARCHAR(255) NOT NULL,
+    menu_name VARCHAR(255) UNIQUE,
     price INTEGER NOT NULL,
     image_url TEXT,
     category TEXT 
@@ -35,13 +35,14 @@ CREATE TABLE menu (
 -- Table: menu_quantity
 -- ========================
 CREATE TABLE menu_quantity (
-    Qnumber INTEGER PRIMARY KEY AUTOINCREMENT,
     order_no INTEGER NOT NULL,
-    menu_id INTEGER,
+    menu_name VARCHAR(255) NOT NULL,
     quantity INTEGER NOT NULL,
     subtotal INTEGER NOT NULL,
-    FOREIGN KEY (menu_id) REFERENCES menu (menu_id) ON DELETE SET NULL
+    -- กำหนดให้ order_no และ menu_name รวมกันเป็น Primary Key
+    PRIMARY KEY (order_no, menu_name)
 );
+
 
 -- ========================
 -- Table: manager_logs
@@ -50,7 +51,6 @@ CREATE TABLE manager_logs (
     log_id INTEGER PRIMARY KEY AUTOINCREMENT,
     manager_id INTEGER,
     action_type VARCHAR(50),
-    table_name VARCHAR(50),
     old_value TEXT,
     new_value TEXT,
     FOREIGN KEY (manager_id) REFERENCES manager (manager_id) ON DELETE SET NULL
