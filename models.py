@@ -27,7 +27,6 @@ CREATE TABLE menu (
     menu_id INTEGER PRIMARY KEY AUTOINCREMENT,
     menu_name VARCHAR(255) UNIQUE,
     price INTEGER NOT NULL,
-    image_url TEXT,
     category TEXT 
 );
 
