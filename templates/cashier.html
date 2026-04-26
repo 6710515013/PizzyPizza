@@ -5,6 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizza POS Project - แคชเชียร์</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* สไตล์ปกติสำหรับหน้าจอใบเสร็จ (ซ่อนไว้ก่อน) */
+        #receipt-print { display: none; }
+
+        /* สไตล์พิเศษเมื่อสั่ง Print (@media print) */
+        @media print {
+            /* ตั้งค่าหน้ากระดาษเป็น 80mm */
+            @page { 
+                size: 80mm auto; 
+                margin: 0; 
+            }
+            body * { visibility: hidden; } /* ซ่อนทุกอย่างบนหน้าจอ */
+            #receipt-print, #receipt-print * { visibility: visible; } /* แสดงเฉพาะใบเสร็จ */
+            #receipt-print {
+                display: block;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                font-family: 'Courier New', Courier, monospace; /* ฟอนต์แนวเครื่องพิมพ์ใบเสร็จ */
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-100 h-screen overflow-hidden flex">
 
@@ -67,6 +90,7 @@
                 </button>
             </a>
         </div>
+        
     </div>
 
     <script>
@@ -195,13 +219,33 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // หากบันทึกสำเร็จ ให้แสดงหมายเลขคิว (order_no) ที่ได้จากหลังบ้าน
-                    alert(`✅ ชำระเงินสำเร็จ!\nหมายเลขคิวของคุณคือ: ${data.order_no}`);
-                    cart = []; // ล้างข้อมูลตะกร้า
-                    renderCart(); // ล้างหน้าจอ
-                } else {
-                    alert("❌ เกิดข้อผิดพลาด: " + data.message);
-                }
+                    // --- ส่วนที่เพิ่มมาใหม่: เตรียมข้อมูลปริ้น ---
+                    document.getElementById('print-order-no').innerText = data.order_no;
+                    document.getElementById('print-date').innerText = new Date().toLocaleString('th-TH');
+                    document.getElementById('print-total').innerText = document.getElementById('total-price').innerText + ' บาท';
+
+                    const printItemsList = document.getElementById('print-items-list');
+                    printItemsList.innerHTML = ''; // ล้างค่าเก่า
+                    cart.forEach(item => {
+                        printItemsList.innerHTML += `
+                            <div class="flex justify-between">
+                                <span>${item.name} x ${item.qty}</span>
+                                <span>${(item.price * item.qty).toLocaleString()}.-</span>
+                            </div>`;
+                });
+
+                // สั่งปริ้นทันที!
+                window.print(); 
+                // ----------------------------------------
+
+
+                // หากบันทึกสำเร็จ ให้แสดงหมายเลขคิว (order_no) ที่ได้จากหลังบ้าน
+                alert(`✅ ชำระเงินสำเร็จ!\nหมายเลขคิวของคุณคือ: ${data.order_no}`);
+                cart = []; // ล้างข้อมูลตะกร้า
+                renderCart(); // ล้างหน้าจอ
+            } else {
+                alert("❌ เกิดข้อผิดพลาด: " + data.message);
+            }
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -269,5 +313,29 @@
         loadMenus(); // โหลดข้อมูลอาหารจากฐานข้อมูล
     </script>
 
+    
+    <div id="receipt-print" class="p-4 text-sm">
+        <div class="text-center">
+            <h1 class="text-xl font-bold">🍕 PIZZYPIZZA</h1>
+            <p>ใบรับออเดอร์ / คิวลูกค้า</p>
+            <p>--------------------------------</p>
+        </div>
+        <div class="my-2">
+            <p>เลขที่ออเดอร์: <span id="print-order-no" class="font-bold text-lg"></span></p>
+            <p>วันที่: <span id="print-date"></span></p>
+        </div>
+        <p>--------------------------------</p>
+        <div id="print-items-list">
+            </div>
+        <p>--------------------------------</p>
+        <div class="flex justify-between font-bold">
+            <span>ยอดรวมทั้งสิ้น:</span>
+            <span id="print-total">0</span>
+        </div>
+        <div class="text-center mt-6">
+            <p>ขอบคุณที่ใช้บริการครับ</p>
+            <p>กรุณารอเรียกคิวของท่าน</p>
+        </div>
+    </div>
 </body>
 </html>
