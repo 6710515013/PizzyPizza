@@ -1,0 +1,217 @@
+// --- ตัวแปรสำหรับเก็บข้อมูล ---
+let menuData = {}; // เก็บข้อมูลเมนูที่ดึงมาจากฐานข้อมูล
+let currentCategory = 'pizza'; // หมวดหมู่เริ่มต้นที่เปิดแสดง
+let cart = []; // เก็บรายการอาหารที่ลูกค้าเลือก
+
+// 1. ฟังก์ชันดึงข้อมูลเมนูจาก Backend (API ที่เราสร้างใน app.py)
+async function loadMenus() {
+    try {
+        // ส่งคำขอไปดึงข้อมูลจากฐานข้อมูล
+        const response = await fetch('/api/menus');
+        menuData = await response.json(); // เก็บข้อมูลลงตัวแปร menuData
+
+        renderMenu(); // วาดเมนูขึ้นหน้าจอ
+        updateTabStyles(); // ปรับสีปุ่มหมวดหมู่ให้ถูกต้อง
+    } catch (error) {
+        console.error("ไม่สามารถโหลดข้อมูลเมนูได้:", error);
+        alert("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล");
+    }
+}
+
+// 2. ฟังก์ชันเมื่อกดเปลี่ยนหมวดหมู่ (Pizza -> Snack -> Drink)
+function changeCategory(category) {
+    currentCategory = category;
+    updateTabStyles();
+    renderMenu();
+}
+
+// 3. ฟังก์ชันวาดปุ่มเมนูบนหน้าจอ
+function renderMenu() {
+    const grid = document.getElementById('menu-grid');
+    if (!grid) return;
+    grid.innerHTML = ''; // ล้างหน้าจอเดิมก่อน
+
+    // วนลูปสร้างปุ่มตามหมวดหมู่ที่เลือก
+    if (menuData[currentCategory]) {
+        menuData[currentCategory].forEach(item => {
+            grid.innerHTML += `
+                        <button onclick="addToCart(${item.id}, '${item.name}', ${item.price})" 
+                            class="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl active:scale-95 transition-all text-center border-2 border-transparent hover:border-red-400">
+                            <span class="block font-bold text-xl text-gray-800">${item.name}</span>
+                            <span class="block text-red-500 font-bold mt-2">${item.price}.-</span>
+                        </button>
+                    `;
+        });
+    }
+}
+
+// 4. ฟังก์ชันเพิ่มรายการอาหารลงตะกร้า
+function addToCart(id, name, price) {
+    const existingItem = cart.find(item => item.id === id);
+    if (existingItem) {
+        // ถ้ามีเมนูนี้ในตะกร้าแล้ว ให้บวกจำนวนเพิ่ม
+        existingItem.qty += 1;
+    } else {
+        // ถ้ายังไม่มี ให้สร้างรายการใหม่
+        cart.push({ id: id, name: name, price: price, qty: 1 });
+    }
+    renderCart(); // อัปเดตตะกร้าหน้าจอ
+}
+
+// 5. ฟังก์ชันแสดงรายการในตะกร้า
+function renderCart() {
+    const list = document.getElementById('cart-items');
+    const totalDisplay = document.getElementById('total-price');
+    list.innerHTML = '';
+    let total = 0;
+
+    // วนลูปรายการที่เลือกเพื่อแสดงผล
+    cart.forEach((item, index) => {
+        const itemTotal = item.price * item.qty;
+        total += itemTotal;
+        list.innerHTML += `
+                    <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border-l-4 border-red-500 mb-2">
+                        <div class="flex-grow">
+                            <div class="flex justify-between">
+                                <p class="font-bold text-gray-800">${item.name}</p>
+                                <p class="font-bold text-blue-600">x${item.qty}</p> 
+                            </div>
+                            <p class="text-sm text-gray-500">${item.price}.- (รวม ${itemTotal}.-)</p>
+                        </div>
+                        <button onclick="removeItem(${index})" class="ml-4 text-red-400 hover:text-red-600 font-bold text-xs bg-red-50 px-2 py-1 rounded italic">ลด/ลบ</button>
+                    </div>
+                `;
+    });
+
+    if (cart.length === 0) {
+        list.innerHTML = '<div class="text-center text-gray-400 mt-10 italic">ยังไม่มีรายการอาหาร...</div>';
+    }
+    totalDisplay.innerText = total.toLocaleString(); // แสดงราคารวม
+}
+
+// 6. ฟังก์ชันลบ/ลดจำนวนสินค้าในตะกร้า
+function removeItem(index) {
+    if (cart[index].qty > 1) {
+        cart[index].qty -= 1; // ลดจำนวน
+    } else {
+        cart.splice(index, 1); // ลบออกเมื่อเหลือ 0
+    }
+    renderCart();
+}
+
+// 7. ฟังก์ชันล้างตะกร้าทั้งหมด
+function clearCart() {
+    if (confirm("ต้องการล้างรายการทั้งหมดใช่หรือไม่?")) {
+        cart = [];
+        renderCart();
+    }
+}
+
+// 8. ฟังก์ชันชำระเงิน (ส่งข้อมูลไปบันทึกลง Database) ***แก้ไขใหม่***
+function checkout() {
+    if (cart.length === 0) {
+        alert("ยังไม่มีรายการอาหาร กรุณาเลือกเมนูก่อนชำระเงินครับ");
+        return;
+    }
+
+    // ส่งข้อมูล cart ไปที่ backend (app.py) ผ่าน /checkout
+    fetch('/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cart: cart }) // แปลงข้อมูลให้เป็น JSON
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // --- ส่วนที่เพิ่มมาใหม่: เตรียมข้อมูลปริ้น ---
+                document.getElementById('print-order-no').innerText = data.order_no;
+                document.getElementById('print-date').innerText = new Date().toLocaleString('th-TH');
+                document.getElementById('print-total').innerText = document.getElementById('total-price').innerText + ' บาท';
+
+                const printItemsList = document.getElementById('print-items-list');
+                printItemsList.innerHTML = ''; // ล้างค่าเก่า
+                cart.forEach(item => {
+                    printItemsList.innerHTML += `
+                            <div class="flex justify-between">
+                                <span>${item.name} x ${item.qty}</span>
+                                <span>${(item.price * item.qty).toLocaleString()}.-</span>
+                            </div>`;
+                });
+
+                // สั่งปริ้นทันที!
+                window.print();
+                // ----------------------------------------
+
+
+                // หากบันทึกสำเร็จ ให้แสดงหมายเลขคิว (order_no) ที่ได้จากหลังบ้าน
+                alert(`✅ ชำระเงินสำเร็จ!\nหมายเลขคิวของคุณคือ: ${data.order_no}`);
+                cart = []; // ล้างข้อมูลตะกร้า
+                renderCart(); // ล้างหน้าจอ
+            } else {
+                alert("❌ เกิดข้อผิดพลาด: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("ไม่สามารถติดต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่");
+        });
+}
+
+// 9. ฟังก์ชันปรับแต่งสีปุ่มหมวดหมู่ให้สวยงาม
+function updateTabStyles() {
+    const categories = ['pizza', 'snack', 'drink'];
+    categories.forEach(cat => {
+        const btn = document.getElementById(`btn-${cat}`);
+        if (cat === currentCategory) {
+            // ปุ่มที่ถูกเลือก (สีแดง)
+            btn.className = "flex-1 py-4 bg-red-600 text-white rounded-xl font-bold shadow-md transition-all";
+        } else {
+            // ปุ่มที่ไม่ได้เลือก (สีขาว)
+            btn.className = "flex-1 py-4 bg-white text-gray-700 rounded-xl font-bold shadow-sm hover:bg-gray-100 transition-all border border-gray-200";
+        }
+    });
+}
+
+// 10. ฟังก์ชันค้นหาเมนู
+function searchMenu() {
+    const searchTerm = document.getElementById('search-input').value.toLowerCase();
+    const grid = document.getElementById('menu-grid');
+
+    if (searchTerm === '') {
+        renderMenu();
+        return;
+    }
+
+    grid.innerHTML = '';
+    let foundCategories = new Set();
+    let lastFoundCategory = '';
+
+    Object.keys(menuData).forEach(category => {
+        menuData[category].forEach(item => {
+            if (item.name.toLowerCase().includes(searchTerm)) {
+                lastFoundCategory = category;
+                foundCategories.add(category);
+
+                grid.innerHTML += `
+                            <button onclick="addToCart(${item.id}, '${item.name}', ${item.price})" 
+                                class="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl active:scale-95 transition-all text-center border-2 border-transparent hover:border-red-400 animate-fade-in">
+                                <span class="block font-bold text-xl text-gray-800">${item.name}</span>
+                                <span class="block text-red-500 font-bold mt-2">${item.price}.-</span>
+                            </button>
+                        `;
+            }
+        });
+    });
+
+    if (foundCategories.size === 1 && lastFoundCategory !== currentCategory) {
+        currentCategory = lastFoundCategory;
+        updateTabStyles();
+    }
+
+    if (grid.innerHTML === '') {
+        grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 italic">ไม่พบเมนูที่ค้นหา...</div>';
+    }
+}
+
+// --- เริ่มต้นการทำงาน (เมื่อเปิดหน้าเว็บ) ---
+loadMenus(); // โหลดข้อมูลอาหารจากฐานข้อมูล
